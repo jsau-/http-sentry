@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/python3
 """http-sentry.
 
 A script for executing a series of web requests, and asserting an expected
