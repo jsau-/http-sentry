@@ -3,6 +3,8 @@
 A quick and dirty script for asserting a set of HTTP requests resolve with
 expected status codes, plaintext content, or match a regex.
 
+*NOTE:* This repository will likely not be actively maintained or updated. This is just a release of something knocked up for a personal project.
+
 ## Running
 
 `python3 http_sentry.py <config_file_path>`
