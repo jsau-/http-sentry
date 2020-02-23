@@ -116,3 +116,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Local Development
+.test_config.json
+.test_log.txt
