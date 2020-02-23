@@ -5,13 +5,21 @@
       "description": "An object which describes the expected result of a given check.",
       "type": "object",
       "properties": {
+        "json": {
+          "description": "JSON response we expect to receive.",
+          "type": "object"
+        },
+        "regex": {
+          "description": "Regex we expect the response to conform to.",
+          "type": "string"
+        },
         "status": {
           "description": "HTTP status code we expect to receive.",
           "type": "integer"
         },
-        "body": {
-          "description": "Response body we expect to receive, either as a plain string or as a JSON object.",
-          "type": ["string", "object"]
+        "text": {
+          "description": "Text response we expect to receive.",
+          "type": "string"
         }
       },
       "required": ["status"]
@@ -22,7 +30,7 @@
       "properties": {
         "body": {
           "description": "Response body to send, either as a plain string or as a JSON object.",
-          "type": "string"
+          "type": ["string", "object"]
         },
         "method": {
           "description": "HTTP method to use when making the request. This will default to 'get' if not specified.",

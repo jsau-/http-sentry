@@ -20,6 +20,7 @@ from docopt import docopt
 from jsonschema import validate
 import logging
 import json
+import re
 import requests
 import time
 
@@ -37,12 +38,15 @@ def read_config_file(config_file_path):
     config = json.load(config_file)
     return config
 
-def handle_check_failure(check, reason, webhook, meta):
+def handle_check_failure(check, reason, webhook, meta, response):
   logging.error(
     'Check \'%s\' failed. %s',
     check['name'],
     reason
   )
+
+  if response:
+    response_text = response.text
 
   if webhook:
     try:
@@ -55,6 +59,9 @@ def handle_check_failure(check, reason, webhook, meta):
           'meta': meta,
           'passed': False,
           'reason': reason,
+          'response': {
+            'text': response_text
+          },
           'epoch': time.time()
         }
       )
@@ -65,8 +72,11 @@ def handle_check_failure(check, reason, webhook, meta):
         str(e)
       )
 
-def handle_check_success(check, webhook, meta):
+def handle_check_success(check, webhook, meta, response):
   logging.debug('Check \'%s\' completed successfully', check['name'])
+
+  if response:
+    response_text = response.text
 
   if webhook:
     try:
@@ -78,6 +88,9 @@ def handle_check_success(check, webhook, meta):
           'check': check,
           'meta': meta,
           'passed': True,
+          'response': {
+            'text': response_text
+          },
           'epoch': time.time()
         }
       )
@@ -99,7 +112,7 @@ def run_check(check, webhook_success, webhook_failure, meta):
       data = check['request'].get('body', {})
     )
   except requests.exceptions.RequestException as e:
-    handle_check_failure(check, str(e), webhook_failure, meta)
+    handle_check_failure(check, str(e), webhook_failure, meta, None)
     return
 
   expected_status_code = check['expect'].get('status')
@@ -109,24 +122,28 @@ def run_check(check, webhook_success, webhook_failure, meta):
       check,
       'Expected status code %d, but received %d' % (expected_status_code, response.status_code),
       webhook_failure,
-      meta
+      meta,
+      response
     )
 
     return
 
-  expected_body = check['expect'].get('body')
+  expected_text = check['expect'].get('text')
 
-  if expected_body and type(expected_body) == str and expected_body != response.text:
+  if expected_text is not None and expected_text != response.text:
     handle_check_failure(
       check,
-      'Expected body \'%s\', but received \'%s\'' % (expected_body, response.text),
+      'Expected text \'%s\', but received \'%s\'' % (expected_text, response.text),
       webhook_failure,
-      meta
+      meta,
+      response
     )
 
     return
 
-  if expected_body and type(expected_body) == dict:
+  expected_json = check['expect'].get('json')
+
+  if expected_json is not None:
     try:
       response_json = response.json()
     except:
@@ -134,22 +151,37 @@ def run_check(check, webhook_success, webhook_failure, meta):
         check,
         'Failed to parse response as JSON',
         webhook_failure,
-        meta
+        meta,
+        response
       )
 
       return
 
-    if response_json != expected_body:
+    if response_json != expected_json:
       handle_check_failure(
         check,
-        'Expected body \'%s\', but received \'%s\'' % (expected_body, response_json),
+        'Expected JSON \'%s\', but received \'%s\'' % (expected_json, response_json),
         webhook_failure,
-        meta
+        meta,
+        response
       )
 
       return
 
-  handle_check_success(check, webhook_success, meta)
+  expected_regex = check['expect'].get('regex')
+
+  if expected_regex is not None and not re.compile(expected_regex).match(response.text):
+    handle_check_failure(
+      check,
+      'Expected content \'%s\' to match regex \'%s\', but did not.' % (response.text, expected_regex),
+      webhook_failure,
+      meta,
+      response
+    )
+
+    return
+
+  handle_check_success(check, webhook_success, meta, response)
 
 def main():
   arguments = docopt(__doc__, version=VERSION)
