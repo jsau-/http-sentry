@@ -2,64 +2,120 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "expect": {
+      "description": "An object which describes the expected result of a given check.",
       "type": "object",
       "properties": {
-        "status": { "type": "integer" },
-        "body": { "type": ["string", "object"] }
+        "status": {
+          "description": "HTTP status code we expect to receive.",
+          "type": "integer"
+        },
+        "body": {
+          "description": "Response body we expect to receive, either as a plain string or as a JSON object.",
+          "type": ["string", "object"]
+        }
       },
       "required": ["status"]
     },
     "request": {
+      "description": "An object which describes a request to make when running a check.",
       "type": "object",
       "properties": {
-        "body": { "type": "string" },
-        "method": {
-          "type": "string",
-          "enum": ["get", "post", "put", "patch", "delete", "options"]
+        "body": {
+          "description": "Response body to send, either as a plain string or as a JSON object.",
+          "type": "string"
         },
-        "headers": { "type": "object" },
-        "timeout": { "type": "number" },
-        "url": { "type": "string" }
+        "method": {
+          "description": "HTTP method to use when making the request. This will default to 'get' if not specified.",
+          "enum": ["get", "post", "put", "patch", "delete", "options"],
+          "type": "string"
+        },
+        "headers": {
+          "description": "Set of HTTP headers to include on the request.",
+          "type": "object"
+        },
+        "timeout": {
+          "description": "Timeout in seconds we should wait for before failing the test if no response is received.",
+          "type": "number"
+        },
+        "url": {
+          "description": "URL to make the request to.",
+          "type": "string"
+        }
       },
       "required": ["url"]
     },
     "webhook": {
+      "description": "An object which describes a request to make after completing a check, either successfully or unsuccessfully.",
       "type": "object",
       "properties": {
-        "headers": { "type": "object" },
-        "timeout": { "type": "number" },
-        "url": { "type": "string" }
+        "headers": {
+          "description": "Set of HTTP headers to include on the request.",
+          "type": "object"
+        },
+        "timeout": {
+          "description": "Timeout in seconds we should wait for before aborting the request if no response is received.",
+          "type": "number"
+        },
+        "url": {
+          "description": "URL to make the request to.",
+          "type": "string"
+        }
       },
       "required": ["url"]
     },
     "check": {
-      "type": "object",
+      "description": "An object which describes a check to run.",
       "properties": {
-        "name": { "type": "string" },
-        "expect": { "$ref": "#/definitions/expect" },
-        "request": { "$ref": "#/definitions/request" }
+        "name": {
+          "description": "Name that should help uniquely identify the check in logs, and webhook calls.",
+          "type": "string"
+        },
+        "expect": {
+          "$ref": "#/definitions/expect",
+          "description": "The expected result of the check."
+        },
+        "request": {
+          "$ref": "#/definitions/request",
+          "description": "The request to make."
+        }
       },
-      "required": ["name", "expect", "request"]
+      "required": ["name", "expect", "request"],
+      "type": "object"
     }
   },
-  "type": "object",
   "properties": {
-    "name": { "type": "string" },
-    "meta": { "type": "object" },
-    "logfile": { "type": "string" },
+    "name": {
+      "description": "Name that should help uniquely identify the set of all checks in logs, and webhook calls.",
+      "type": "string"
+    },
+    "meta": {
+      "description": "Additional metadata included in webhooks that can help uniquely identify the set of all checks.",
+      "type": "object"
+    },
+    "logfile": {
+      "description": "File path we should use when writing logs. If omitted the script writes to stdout.",
+      "type": "string"
+    },
     "checks": {
-      "type": "array",
+      "description": "Set of all checks to run.",
       "items": {
         "$ref": "#/definitions/check"
-      }
+      },
+      "type": "array"
     },
     "webhooks": {
-      "type": "object",
+      "description": "Set of webhooks.",
       "properties": {
-        "failure": { "$ref": "#/definitions/webhook" },
-        "success": { "$ref": "#/definitions/webhook" }
-      }
+        "failure": {
+          "$ref": "#/definitions/webhook"
+        },
+        "success": {
+          "$ref": "#/definitions/webhook"
+        }
+      },
+      "type": "object"
     }
   },
-  "required": ["checks"]
+  "required": ["checks"],
+  "type": "object"
 }
