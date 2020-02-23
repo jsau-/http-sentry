@@ -1,0 +1,101 @@
+{
+  "name": "Test Config",
+  "logfile": "./.test_log.txt",
+  "meta": {
+    "additional_field_one": 1,
+    "additional_field_two": 22
+  },
+  "checks": [
+    {
+      "name": "JSON API Succeeds",
+      "expect": {
+        "status": 200,
+        "body": {
+          "title": "delectus aut autem",
+          "id": 1,
+          "userId": 1,
+          "completed": false
+        }
+      },
+      "request": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1"
+      }
+    },
+    {
+      "name": "JSON API Fails due to status code",
+      "expect": {
+        "status": 201,
+        "body": {
+          "title": "delectus aut autem",
+          "id": 1,
+          "userId": 1,
+          "completed": false
+        }
+      },
+      "request": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1"
+      }
+    },
+    {
+      "name": "JSON API Fails due to body",
+      "expect": {
+        "status": 200,
+        "body": {
+          "title2": "delectus aut autem",
+          "id": 1,
+          "userId": 1,
+          "completed": false
+        }
+      },
+      "request": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1"
+      }
+    },
+    {
+      "name": "Raw Text Succeeds",
+      "expect": {
+        "status": 200,
+        "body": "Hello from Docker!\n"
+      },
+      "request": {
+        "url": "https://raw.githubusercontent.com/docker-library/hello-world/master/greetings/hello-world.txt"
+      }
+    },
+    {
+      "name": "Raw Text Fails Due To Status Code",
+      "expect": {
+        "status": 201,
+        "body": "Hello from Docker2!"
+      },
+      "request": {
+        "url": "https://raw.githubusercontent.com/docker-library/hello-world/master/greetings/hello-world.txt"
+      }
+    },
+    {
+      "name": "Raw Text Fails Due To Body",
+      "expect": {
+        "status": 200,
+        "body": "Hello from Docker44!"
+      },
+      "request": {
+        "url": "https://raw.githubusercontent.com/docker-library/hello-world/master/greetings/hello-world.txt"
+      }
+    }
+  ],
+  "webhooks": {
+    "failure": {
+      "headers": {
+        "Authorization": "foo"
+      },
+      "timeout": 5,
+      "url": "http://localhost:8080/failure"
+    },
+    "success": {
+      "headers": {
+        "Authorization": "foo"
+      },
+      "timeout": 5,
+      "url": "http://localhost:8080/success"
+    }
+  }
+}
