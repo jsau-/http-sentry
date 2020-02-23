@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "expect": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "integer" },
+        "body": { "type": ["string", "object"] }
+      },
+      "required": ["status"]
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "body": { "type": "string" },
+        "method": {
+          "type": "string",
+          "enum": ["get", "post", "put", "patch", "delete", "options"]
+        },
+        "headers": { "type": "object" },
+        "timeout": { "type": "number" },
+        "url": { "type": "string" }
+      },
+      "required": ["url"]
+    },
+    "webhook": {
+      "type": "object",
+      "properties": {
+        "headers": { "type": "object" },
+        "timeout": { "type": "number" },
+        "url": { "type": "string" }
+      },
+      "required": ["url"]
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "expect": { "$ref": "#/definitions/expect" },
+        "request": { "$ref": "#/definitions/request" }
+      },
+      "required": ["name", "expect", "request"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "meta": { "type": "object" },
+    "logfile": { "type": "string" },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/check"
+      }
+    },
+    "webhooks": {
+      "type": "object",
+      "properties": {
+        "failure": { "$ref": "#/definitions/webhook" },
+        "success": { "$ref": "#/definitions/webhook" }
+      }
+    }
+  },
+  "required": ["checks"]
+}
