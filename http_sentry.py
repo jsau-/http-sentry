@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """http-sentry.
 
-A tool for executing a series of web requests, and asserting an expected
+A script for executing a series of web requests, and asserting an expected
 response. See 'config_schema.json' for a list of available configuration
 parameters.
 
