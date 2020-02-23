@@ -18,7 +18,6 @@ Options:
 
 from docopt import docopt
 from jsonschema import validate
-from string import Template
 import logging
 import json
 import requests
