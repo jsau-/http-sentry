@@ -48,7 +48,7 @@ def handle_check_failure(check, reason, webhook, meta, response):
   if response:
     response_text = response.text
   else:
-    response_text = ‘’
+    response_text = ''
 
   if webhook:
     try:
@@ -80,7 +80,7 @@ def handle_check_success(check, webhook, meta, response):
   if response:
     response_text = response.text
   else:
-    response_text = ‘’
+    response_text = ''
 
   if webhook:
     try:
